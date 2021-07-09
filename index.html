@@ -1,1 +1,289 @@
-<h1>Hello World!</h1>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>码码工具箱-码农工具</title>
+    <meta name="keywords" content="码码工具,URLencode,urldecode,Url编码,Url解码,md5加密,哈希加密,css取色器" />
+    <meta name="description" content="码码工具只做简洁好用的程序员工具箱，支持urldecode,md5,哈希,时间戳工具" />
+    <link rel="stylesheet" href="//unpkg.com/element-ui@2.15.1/lib/theme-chalk/index.css">
+</head>
+<body>
+    <div class="box-header">
+      <a href="/"><div class="nav-item active">常用工具</div></a>
+      <a href="/image-tool.html"><div class="nav-item">图片工具</div></a>
+      <a href="/search-tool.html"><div class="nav-item">查询工具</div></a>
+      <a href="/tech-blog.html"><div class="nav-item">技术博客</div></a>
+    </div>
+    <div class="box-main" id="app">
+        <el-tabs type="card" @tab-click="tabPosition">
+          <el-tab-pane>
+            <span slot="label"><i class="el-icon-link"></i> 链接处理</span>
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 8, maxRows: 16}"
+              placeholder="请输要处理的入链接"
+              v-model="subdata.link">
+            </el-input>
+            <el-row class="tool-button-item func-url-btn">
+              <el-button size="medium" @click="handleUrl('encode')">编码(f8)</el-button>
+              <el-button size="medium" @click="handleUrl('decode')">解码(f9)</el-button>
+            </el-row>
+          </el-tab-pane>
+
+          <el-tab-pane> 
+            <span slot="label"> <i class="el-icon-lock"></i> 加密处理 </span>
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 2, maxRows: 4}"
+              placeholder="请输要加密的字符串"
+              v-model="subdata.encryptStr">
+            </el-input>
+            <el-row class="tool-button-item func-encrypt-btn">
+              <el-button size="medium" @click="encrypt('md5')">MD5(f8)</el-button>
+              <el-button size="medium" @click="encrypt('sha1')">SHA1(f9)</el-button>
+            </el-row>
+          </el-tab-pane>
+
+          <el-tab-pane> 
+            <span slot="label"> <i class="el-icon-date"></i> 时间转换 </span>
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 2, maxRows: 4}"
+              placeholder="请输要转换的时间或时间戳(yyyy-mmm-dd | timestamp)"
+              v-model="subdata.timeStr">
+            </el-input> 
+            <el-row class="tool-button-item func-time-btn">
+              <el-button size="medium" @click="timeFormat('date2time')">日期转time(f8)</el-button>
+              <el-button size="medium" @click="timeFormat('time2date')">time转日期(f9)</el-button>
+            </el-row>
+          </el-tab-pane>
+
+          <el-tab-pane> 
+            <span slot="label"> <i class="el-icon-document"></i> JSON处理 </span>
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 8, maxRows: 16}"
+              placeholder="请输要处理的json字符串"
+              v-model="subdata.jsonStr">
+            </el-input>
+            <el-row class="tool-button-item func-json-btn">
+              <el-button size="medium" @click="jsonFormat">格式化(f8)</el-button>
+              <el-button size="medium" @click="unEscape">去转义(f9)</el-button>
+            </el-row>
+          </el-tab-pane>
+
+          <el-tab-pane> 
+            <span slot="label"> <i class="el-icon-pie-chart"></i> 取色器 </span>
+            <div class="tool-button-item func-color-btn block color-button">
+                <el-button>
+                    <span>16进制</span>
+                    <el-color-picker v-model="color1"></el-color-picker>
+                </el-button>
+
+                <el-button>
+                    <span>RGB色</span>
+                    <el-color-picker v-model="color2" :show-alpha="true"></el-color-picker>
+                </el-button>
+                
+            </div>
+          </el-tab-pane>
+
+          
+        </el-tabs>
+    </div>
+
+    <div class="footer-ul" :id="showFooter"><a href="http://beian.miit.gov.cn/" target="__blank">版权所有，保留一切权利！|&nbsp;&nbsp;蜀ICP备20018750号-1</a></div>
+</body>
+    <style>
+        body{
+            margin: 0;
+        }
+        a{
+          text-decoration: none;
+          color: #999;
+          font-size: .8rem;
+          font-weight: 600;
+        }
+        .box-header{
+          position: fixed;
+          display: flex;
+          justify-content: center;
+          top: 0px;
+          width: 100%;
+          height: 2.8rem;
+          line-height: 2.8rem;
+          background: #303133;
+          color: white;
+        }
+        .nav-item{
+          width: 6rem;
+          text-align: center;
+          cursor: pointer;         
+        }
+        .nav-item:hover{
+          color: #fff;
+        }
+        .box-main{
+            width: 50%;
+            margin-top: 5rem;
+            margin-left: 25%;
+        }
+        .active{
+          color: white;
+        }
+        .el-tabs{
+            border: 2px solid #eee;
+            padding: 25px;
+            border-radius: 6px;
+        }
+
+        .is-top{
+            user-select: none;
+        }
+
+        .el-tabs__content{
+            min-height: 280px;
+        }
+
+        .footer-ul{
+            position: absolute;
+            width: 100%;
+            height: 4rem;
+            background: #171725;
+            text-align: center;
+            line-height: 4rem;
+            bottom: 0;
+            
+        }
+
+        .footer-ul a {
+            color: #999;
+            font-size: .8rem;
+        }
+
+        .footer-ul a:link {
+            text-decoration: none;
+        }
+
+
+        .tool-button-item{
+            margin-top: 1.2rem;
+            text-align: right;
+        }
+
+        .el-color-picker{
+           margin-left: 1rem;
+        }
+        .color-button{
+            margin-top: 2rem;
+            text-align: center;
+        }
+        #hide_footer{
+            display: none;
+        }
+    </style>
+    <script src="//libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//unpkg.com/vue@2.6.12/dist/vue.js"></script>
+    <script src="//unpkg.com/element-ui@2.15.1/lib/index.js"></script>
+    <script>
+      var eventBtn = 'func-url-btn';
+      var vm = new Vue({
+       el: '#app',
+       data: function() {
+         return {
+          apiurl: 'toolbox.php',
+          showFooter:'hide_footer',
+          subdata: {
+            link: '',
+            encryptStr: '',
+            timeStr: '',
+            jsonStr: ''
+          },
+          showRGB: false ,
+          color1: '#409EFF',
+          color2: 'rgba(255, 69, 0, 0.68)'
+         }
+       },
+       methods: {
+         handleUrl: function(action = 'encode'){
+            $.post(this.apiurl, {data:this.subdata.link, option: 'url', action:action}, res=>{
+                this.subdata.link = res;
+            })
+         },
+         jsonFormat: function(){
+            try{
+                var formatData = JSON.parse(this.subdata.jsonStr);
+                var res = JSON.stringify(formatData, null, 4);
+                this.subdata.jsonStr = res;
+            }catch(e){
+                console.log(e);
+                this.$message.error('非标准格式json');
+            }
+         },
+         unEscape: function(){
+            var data = this.subdata.jsonStr;
+            var reg = /\\/g;
+            this.subdata.jsonStr = data.replaceAll(reg, '');
+         },
+         encrypt: function(action = 'md5'){
+            $.post(this.apiurl, {data:this.subdata.encryptStr, option: action}, res=>{
+                this.subdata.encryptStr = res;
+            })
+         },
+         timeFormat: function(action = ''){
+            $.post(this.apiurl, {data:this.subdata.timeStr, option:'time', action:action}, res=>{
+                this.subdata.timeStr = res;
+            })
+         },
+        tabPosition: function(e){
+            eventBtn = $(e.$el).find(".tool-button-item").attr("class").split(' ')[1];
+        }
+
+       },
+       mounted: function(){
+            this.showFooter = "show_footer";
+            if(window.innerWidth<1024){
+              $(".box-main").css({"width":"80%", "margin-left":"10%"});
+              $(".func-time-btn button").eq(0).html("转time");
+              $(".func-time-btn button").eq(1).html("转日期");
+            }
+       }
+     })
+
+      $(function(){
+        $(document).keyup(function(e){
+            if(e.key=='F8'){
+                $('.'+eventBtn+' button').eq(0).click();
+            }
+            if(e.key=='F9'){
+                $('.'+eventBtn+' button').eq(1).click();
+            }
+            if(e.key=='Delete'){
+                switch(eventBtn){
+                  case 'func-url-btn':
+                    vm.subdata.link = '';
+                    break;
+                  case 'func-encrypt-btn':
+                    vm.subdata.encryptStr = '';
+                    break;
+                  case 'func-time-btn':
+                    vm.subdata.timeStr = '';
+                    break;
+                  case 'func-json-btn':
+                    vm.subdata.jsonStr = '';
+                    break;
+                }
+            }
+
+        })
+      })
+       
+    </script>
+       
+</html>
