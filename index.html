@@ -16,7 +16,7 @@
 <body>
     <div class="box-header">
       <a href="/"><div class="nav-item active">常用工具</div></a>
-      <a href="https://h5.liyiru.top/app"><div class="nav-item">douyin去水印</div></a>
+      <a href="https://h5.liyiru.top/app"><div class="nav-item">抖音去水印</div></a>
       <a href="https://tool.liyiru.top/search-tool.html"><div class="nav-item">IP查询</div></a>
       <a href="http://product.liyiru.top"><div class="nav-item">个人日记</div></a>
     </div>
@@ -212,9 +212,13 @@
        },
        methods: {
          handleUrl: function(action = 'encode'){
-            $.post(this.apiurl, {data:this.subdata.link, option: 'url', action:action}, res=>{
-                this.subdata.link = res;
-            })
+               if(action!='encode'){
+                   this.subdata.link = decodeURIComponent(this.subdata.link); return ;
+               }
+               this.subdata.link = encodeURIComponent(this.subdata.link);
+//             $.post(this.apiurl, {data:this.subdata.link, option: 'url', action:action}, res=>{
+//                 this.subdata.link = res;
+//             })
          },
          jsonFormat: function(){
             try{
